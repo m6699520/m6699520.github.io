@@ -46,6 +46,32 @@
             80%,100% { transform: translate(-50%, -50%) rotate(360deg) }
         }
 
+        .security-check {
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #28a745; /* 绿色 */
+            font-family: Arial, sans-serif;
+            font-size: 18px; /* 文字放大 */
+            display: flex;
+            align-items: center;
+            gap: 12px; /* 间距加大 */
+        }
+        
+        .security-icon {
+            display: inline-block;
+            width: 28px; /* 图标放大 */
+            height: 28px;
+            border-radius: 50%;
+            background-color: #28a745;
+            color: white;
+            text-align: center;
+            line-height: 28px; /* 文字居中 */
+            font-size: 18px; /* 对勾符号放大 */
+            font-weight: bold;
+        }
+
         .error-message {
             position: absolute;
             top: 60%;
@@ -57,8 +83,13 @@
         }
     </style>
 </head>
-
 <body>
+<!-- 安全检查提示 -->
+<div class="security-check">
+    <span class="security-icon">✓</span>
+    <span>正在进行安全检查...</span>
+</div>
+
 <!-- 三点加载动画容器 -->
 <div class="container" id="loadingContainer">
     <div class="dot dot-1"></div>
@@ -70,97 +101,62 @@
 
 <script>
     (function() {
-        // 白名单域名配置
-        const WHITELIST_CONFIG = {
-            domains: [
-                '*', // 允许所有域名
-            ],
-        };
-
-        // 验证URL域名是否在白名单
-        function isAllowedDomain(url) {
+        // 目标域名配置
+        const TARGET_DOMAIN = 'http://www.bbb.com';
+        
+        // 处理跳转逻辑
+        function processRedirect() {
             try {
-                const domain = new URL(url).hostname.replace('www.', '');
-                // 检查是否允许所有域名
-                if (WHITELIST_CONFIG.domains.includes('*')) {
-                    return true;
+                // 获取当前URL的路径部分
+                const currentPath = window.location.pathname;
+                
+                // 拼接目标URL
+                const targetUrl = TARGET_DOMAIN + currentPath;
+                
+                // 验证目标URL有效性
+                if (!targetUrl.includes('http')) {
+                    showError('无效的目标URL');
+                    return;
                 }
-                return WHITELIST_CONFIG.domains.some(allowedDomain => {
-                    return domain === allowedDomain ||
-                        domain.endsWith('.' + allowedDomain);
-                });
+
+                // 延迟1秒跳转
+                setTimeout(() => {
+                    redirectToUrl(targetUrl);
+                }, 1000); // 改为1秒
             } catch (e) {
-                console.error('URL解析失败:', e);
-                return false;
+                console.error('跳转处理失败:', e);
+                showError('跳转失败，请重试');
             }
         }
 
-        // 处理HTTP跳转的特殊方法
+        // 跳转方法
         function redirectToUrl(url) {
-            // 检查是否是从HTTPS跳转到HTTP
             const isHttpsToHttp = window.location.protocol === 'https:' && url.startsWith('http:');
             
             if (isHttpsToHttp) {
-                // 对于HTTPS到HTTP的跳转，使用meta标签方式
                 const meta = document.createElement('meta');
                 meta.httpEquiv = 'refresh';
                 meta.content = `0;url=${url}`;
                 document.head.appendChild(meta);
                 
-                // 作为备选方案，也尝试使用window.location
                 setTimeout(() => {
                     window.location.href = url;
                 }, 100);
             } else {
-                // 正常跳转
                 window.location.href = url;
-            }
-        }
-
-        // 主处理逻辑（只改了这里！）
-        function processRedirect() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const encodedParam = urlParams.get('c');
-
-            if (!encodedParam) {
-                showError('缺少参数c');
-                return;
-            }
-
-            try {
-                const trueUrl = atob(encodedParam);
-                // 新增：强制解析完整URL，避免末尾标识被截断
-                const fullUrl = new URL(trueUrl).href; 
-                
-                if (fullUrl.includes("http")) {
-                    // 检查域名是否在白名单
-                    if (!isAllowedDomain(fullUrl)) {
-                        showError('该域名不允许跳转');
-                        return;
-                    }
-
-                    // 延迟跳转，让用户看到加载动画
-                    setTimeout(() => {
-                        redirectToUrl(fullUrl); // 这里改用fullUrl
-                    }, 1000);
-                } else {
-                    showError('无效的URL');
-                }
-            } catch (e) {
-                console.error('URL解码失败:', e);
-                showError('URL解码失败');
             }
         }
 
         // 显示错误信息
         function showError(message) {
+            document.querySelector('.security-check').style.display = 'none';
             document.getElementById('loadingContainer').style.display = 'none';
             const errorElement = document.getElementById('errorMessage');
             errorElement.textContent = message;
             errorElement.style.display = 'block';
         }
 
-        // 禁止F12开发者工具
+        // 禁止开发者工具
         document.addEventListener('keydown', function(e) {
             if (e.key === 'F12' ||
                 (e.ctrlKey && e.shiftKey && e.key === 'I') ||
