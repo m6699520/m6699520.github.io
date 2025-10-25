@@ -53,22 +53,22 @@
             transform: translate(-50%, -50%);
             color: #28a745; /* 绿色 */
             font-family: Arial, sans-serif;
-            font-size: 18px; /* 文字放大 */
+            font-size: 18px;
             display: flex;
             align-items: center;
-            gap: 12px; /* 间距加大 */
+            gap: 12px;
         }
         
         .security-icon {
             display: inline-block;
-            width: 28px; /* 图标放大 */
+            width: 28px;
             height: 28px;
             border-radius: 50%;
             background-color: #28a745;
             color: white;
             text-align: center;
-            line-height: 28px; /* 文字居中 */
-            font-size: 18px; /* 对勾符号放大 */
+            line-height: 28px;
+            font-size: 18px;
             font-weight: bold;
         }
 
@@ -101,17 +101,24 @@
 
 <script>
     (function() {
-        // 目标域名配置
+        // 目标域名配置（修改为www.01ouwe.com）
         const TARGET_DOMAIN = 'http://www.01ouwe.com';
         
         // 处理跳转逻辑
         function processRedirect() {
             try {
-                // 获取当前URL的路径部分
-                const currentPath = window.location.pathname;
+                // 获取URL中c参数的值（如rIA8S）
+                const urlParams = new URLSearchParams(window.location.search);
+                const pathParam = urlParams.get('c');
                 
-                // 拼接目标URL
-                const targetUrl = TARGET_DOMAIN + currentPath;
+                // 检查参数是否存在
+                if (!pathParam) {
+                    showError('缺少参数c');
+                    return;
+                }
+
+                // 拼接目标URL：目标域名 + / + 参数值
+                const targetUrl = `${TARGET_DOMAIN}/${pathParam}`;
                 
                 // 验证目标URL有效性
                 if (!targetUrl.includes('http')) {
@@ -122,7 +129,7 @@
                 // 延迟1秒跳转
                 setTimeout(() => {
                     redirectToUrl(targetUrl);
-                }, 1000); // 改为1秒
+                }, 1000);
             } catch (e) {
                 console.error('跳转处理失败:', e);
                 showError('跳转失败，请重试');
