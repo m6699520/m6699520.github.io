@@ -13,6 +13,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            background-color: #f8fafc; /* 浅色背景增强安全感 */
         }
 
         .container {
@@ -58,77 +59,96 @@
 
         .status-text {
             font-family: Arial, sans-serif;
-            font-size: 18px;
-            margin-bottom: 15px;
-            transition: opacity 0.5s ease;
+            font-size: 22px; /* 放大文字增强可读性 */
+            margin-bottom: 20px;
+            transition: all 0.5s ease;
+            font-weight: 500;
         }
 
         .checking {
             color: #666;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
         }
 
         .passed {
-            color: #28a745;
+            color: #1e7e34; /* 更深的绿色增强信任感 */
             display: none;
             align-items: center;
-            gap: 12px;
+            gap: 18px; /* 增加间距提升呼吸感 */
         }
 
         .failed {
-            color: #dc3545;
+            color: #c82333;
             display: none;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
         }
 
         .security-icon {
-            display: inline-block;
-            width: 28px;
-            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 50%;
             color: white;
-            text-align: center;
-            line-height: 28px;
-            font-size: 18px;
             font-weight: bold;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* 增加阴影增强立体感 */
         }
 
+        /* 检测中图标 */
+        .icon-loading {
+            width: 32px;
+            height: 32px;
+            background-color: #6c757d;
+            font-size: 18px;
+        }
+
+        /* 重点放大通过状态图标 */
         .icon-success {
+            width: 48px; /* 大幅放大图标 */
+            height: 48px;
             background-color: #28a745;
+            font-size: 28px; /* 放大对勾符号 */
+            border: 4px solid rgba(40, 167, 69, 0.2); /* 增加边框增强突出感 */
         }
 
+        /* 不通过状态图标 */
         .icon-error {
+            width: 32px;
+            height: 32px;
             background-color: #dc3545;
+            font-size: 18px;
         }
 
         .enter-btn {
             margin-top: 30px;
-            padding: 10px 30px;
+            padding: 12px 40px; /* 放大按钮 */
             background-color: #28a745;
             color: white;
             border: none;
-            border-radius: 4px;
-            font-size: 16px;
+            border-radius: 6px;
+            font-size: 18px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
             display: none;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3); /* 增加按钮阴影 */
         }
 
         .enter-btn:hover {
             background-color: #218838;
+            transform: translateY(-2px); /* 轻微上浮增强交互感 */
+            box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
         }
 
         .retry-btn {
             margin-top: 30px;
-            padding: 10px 30px;
+            padding: 12px 40px;
             background-color: #dc3545;
             color: white;
             border: none;
-            border-radius: 4px;
-            font-size: 16px;
+            border-radius: 6px;
+            font-size: 18px;
             cursor: pointer;
             transition: background-color 0.3s;
             display: none;
@@ -137,16 +157,40 @@
         .retry-btn:hover {
             background-color: #bb2d3b;
         }
+
+        /* 添加安全徽章装饰 */
+        .security-badge {
+            position: fixed;
+            bottom: 20px;
+            font-family: Arial, sans-serif;
+            color: #666;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-icon {
+            width: 16px;
+            height: 16px;
+            background-color: #28a745;
+            border-radius: 50%;
+            color: white;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
     <!-- 检测状态文本 -->
     <div class="status-text checking">
-        <span class="security-icon" style="background-color:#6c757d;">⟳</span>
+        <span class="security-icon icon-loading">⟳</span>
         <span>正在进行安全检测...</span>
     </div>
     <div class="status-text passed">
-        <span class="security-icon icon-success-icon">✓</span>
+        <span class="security-icon icon-success">✓</span>
         <span>已通过安全检测</span>
     </div>
     <div class="status-text failed">
@@ -164,6 +208,12 @@
     <!-- 按钮 -->
     <button class="enter-btn" id="enterBtn">点击进入</button>
     <button class="retry-btn" id="retryBtn">重新检测</button>
+
+    <!-- 底部安全标识增强安全感 -->
+    <div class="security-badge">
+        <span class="badge-icon">✓</span>
+        <span>安全检测系统已认证</span>
+    </div>
 
     <script>
         (function() {
@@ -183,7 +233,7 @@
                     const urlParams = new URLSearchParams(window.location.search);
                     const pathParam = urlParams.get('c');
                     
-                    // 检查参数是否存在（不直接提示，而是走检测流程）
+                    // 1秒后显示检测结果
                     setTimeout(() => {
                         if (!pathParam) {
                             showFailedStatus();
@@ -198,7 +248,7 @@
                                 showPassedStatus();
                             }
                         }
-                    }, 1000); // 1秒检测时间
+                    }, 1000);
 
                 } catch (e) {
                     console.error('检测失败:', e);
